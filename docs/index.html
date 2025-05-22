@@ -324,6 +324,23 @@ body {
   color: var(--wabi-light);
 }
 
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--wabi-muted);
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: var(--wabi-clay);
+}
+
+.empty-state p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 @media (max-width: 480px) {
   .item-header {
     flex-direction: column;
@@ -360,7 +377,7 @@ body {
 </head>
 <body>
 <div class="container">
-  <!-- 헤더 - 간결하게 수정하고 아이콘 강조 -->
+  <!-- 헤더 -->
   <div class="header">
     <div class="header-icon-container">
       <div class="header-icon">🎮</div>
@@ -373,101 +390,17 @@ body {
 
   <!-- 아카이브 리스트 -->
   <div class="archive-list" id="newsArchive">
-    <!-- 샘플 데이터 -->
-    <a href="#" class="archive-item">
-      <div class="item-content">
-        <div class="item-header">
-          <div class="date-container">
-            <div class="weekday-tag">Thu</div>
-            <div class="date-full">2025년 5월 22일</div>
-            <div class="new-badge">NEW</div>
-          </div>
-          <div class="view-button">
-            보기
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="item-subtitle">Microsoft, Game Pass로 80~90년대 Activision 게임 50종 선보인다</div>
-      </div>
-    </a>
+    <!-- 동적으로 뉴스 아이템이 추가됩니다 -->
+  </div>
 
-    <a href="#" class="archive-item">
-      <div class="item-content">
-        <div class="item-header">
-          <div class="date-container">
-            <div class="weekday-tag">Wed</div>
-            <div class="date-full">2025년 5월 21일</div>
-          </div>
-          <div class="view-button">
-            보기
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="item-subtitle">Randy Pitchford, Borderlands 4의 예상 가격 $800에 대한 반발을 겪다</div>
-      </div>
-    </a>
-
-    <a href="#" class="archive-item">
-      <div class="item-content">
-        <div class="item-header">
-          <div class="date-container">
-            <div class="weekday-tag">Tue</div>
-            <div class="date-full">2025년 5월 20일</div>
-          </div>
-          <div class="view-button">
-            보기
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="item-subtitle">Bungie 팬들, Marathon 아는 논란 이후 스튜디오의 혼란에 반응</div>
-      </div>
-    </a>
-
-    <a href="#" class="archive-item">
-      <div class="item-content">
-        <div class="item-header">
-          <div class="date-container">
-            <div class="weekday-tag">Mon</div>
-            <div class="date-full">2025년 5월 19일</div>
-          </div>
-          <div class="view-button">
-            보기
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="item-subtitle">The Elder Scrolls IV: Oblivion 리마스터, 주요 퀘스트 완료한 플레이어 소수</div>
-      </div>
-    </a>
-
-    <a href="#" class="archive-item">
-      <div class="item-content">
-        <div class="item-header">
-          <div class="date-container">
-            <div class="weekday-tag">Sat</div>
-            <div class="date-full">2025년 5월 17일</div>
-          </div>
-          <div class="view-button">
-            보기
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="item-subtitle">Sony의 라이브 서비스 문제 지속, Jade Raymond가 Fairgames 개발사에서 퇴사</div>
-      </div>
-    </a>
+  <!-- 빈 상태 메시지 -->
+  <div class="empty-state" id="emptyState">
+    <h3>아직 뉴스가 없습니다</h3>
+    <p>새로운 일본 게임 뉴스가 업데이트되면 여기에 표시됩니다.</p>
   </div>
 
   <!-- 더보기 버튼 -->
-  <div class="load-more-container">
+  <div class="load-more-container" style="display: none;">
     <button class="load-more-button" id="loadMoreButton">
       더 많은 뉴스레터 불러오기
       <span class="icon">↓</span>
@@ -490,112 +423,67 @@ body {
 <!-- JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // NEW 배지 관리
-  const existingBadges = document.querySelectorAll('.new-badge');
-  existingBadges.forEach(badge => badge.remove());
-
   const archiveList = document.getElementById('newsArchive');
-  const allItems = archiveList.querySelectorAll('.archive-item');
-
-  // 첫 번째 항목에 NEW 배지 추가
-  if (allItems.length > 0) {
-    const firstItem = allItems[0];
-    const dateContainer = firstItem.querySelector('.date-container');
-    if (dateContainer) {
-      const newBadge = document.createElement('div');
-      newBadge.className = 'new-badge';
-      newBadge.textContent = 'NEW';
-      dateContainer.appendChild(newBadge);
-    }
-  }
-
-  // 자동 페이징 기능 구현
-  const itemsPerPage = 5; // 한 페이지에 표시할 항목 수
-  let currentPage = 1;
-
-  // 초기 페이지 설정
-  function initializePagination() {
-    // 총 페이지 수 계산
-    const totalPages = Math.ceil(allItems.length / itemsPerPage);
-
-    // 모든 항목 초기에 숨김
-    allItems.forEach((item, index) => {
-      if (index >= itemsPerPage) {
-        item.classList.add('hidden');
-      }
+  const emptyState = document.getElementById('emptyState');
+  const loadMoreContainer = document.querySelector('.load-more-container');
+  
+  // 뉴스 아이템 추가 함수
+  window.addNewsItem = function(date, weekday, title, url, isNew = false) {
+    // 빈 상태 메시지 숨기기
+    emptyState.style.display = 'none';
+    
+    // 새 아이템 생성
+    const item = document.createElement('a');
+    item.className = 'archive-item';
+    item.href = url;
+    
+    item.innerHTML = `
+      <div class="item-content">
+        <div class="item-header">
+          <div class="date-container">
+            <div class="weekday-tag">${weekday}</div>
+            <div class="date-full">${date}</div>
+            ${isNew ? '<div class="new-badge">NEW</div>' : ''}
+          </div>
+          <div class="view-button">
+            보기
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <p class="item-subtitle">${title}</p>
+      </div>
+    `;
+    
+    // 리스트 맨 위에 추가
+    archiveList.insertBefore(item, archiveList.firstChild);
+    
+    // 기존 NEW 배지 제거
+    const existingBadges = archiveList.querySelectorAll('.new-badge');
+    existingBadges.forEach((badge, index) => {
+      if (index > 0) badge.remove(); // 첫 번째만 유지
     });
-
-    // 마지막 페이지인 경우 '더보기' 버튼 숨김
-    if (totalPages <= 1) {
-      document.getElementById('loadMoreButton').style.display = 'none';
-    }
-
-    return totalPages;
-  }
-
-  const totalPages = initializePagination();
-
-  // 더보기 버튼 클릭 이벤트
-  const loadMoreButton = document.getElementById('loadMoreButton');
-  loadMoreButton.addEventListener('click', function() {
-    if (currentPage < totalPages) {
-      currentPage++;
-
-      // 다음 페이지의 항목들 표시
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = Math.min(startIndex + itemsPerPage, allItems.length);
-
-      let firstNewlyVisibleItem = null;
-
-      for (let i = startIndex; i < endIndex; i++) {
-        allItems[i].classList.remove('hidden');
-        if (!firstNewlyVisibleItem) {
-          firstNewlyVisibleItem = allItems[i];
-        }
-      }
-
-      // 부드러운 스크롤 효과
-      if (firstNewlyVisibleItem) {
-        setTimeout(() => {
-          firstNewlyVisibleItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-      }
-
-      // 마지막 페이지인 경우 '더보기' 버튼 숨김
-      if (currentPage >= totalPages) {
-        loadMoreButton.style.display = 'none';
-      }
-    }
-  });
-
-  // 새 항목이 추가될 때 자동으로 페이지 재계산하는 기능
-  window.recalculatePagination = function() {
-    const updatedItems = archiveList.querySelectorAll('.archive-item');
-
-    // 첫 번째 페이지만 표시하고 나머지는 숨김
-    updatedItems.forEach((item, index) => {
-      if (index < itemsPerPage) {
-        item.classList.remove('hidden');
-      } else {
-        item.classList.add('hidden');
-      }
-    });
-
-    // 총 페이지 수 재계산
-    const newTotalPages = Math.ceil(updatedItems.length / itemsPerPage);
-
-    // 더보기 버튼 표시 여부 결정
-    if (newTotalPages <= 1) {
-      loadMoreButton.style.display = 'none';
-    } else {
-      loadMoreButton.style.display = 'inline-flex';
-    }
-
-    // 현재 페이지 초기화
-    currentPage = 1;
-
-    return newTotalPages;
+    
+    // 더보기 버튼 표시 여부 업데이트
+    updateLoadMoreButton();
   };
+  
+  // 더보기 버튼 업데이트
+  function updateLoadMoreButton() {
+    const items = archiveList.querySelectorAll('.archive-item');
+    if (items.length > 5) {
+      loadMoreContainer.style.display = 'block';
+    }
+  }
+  
+  // 초기 상태: 뉴스가 없으면 빈 상태 메시지 표시
+  const items = archiveList.querySelectorAll('.archive-item');
+  if (items.length === 0) {
+    emptyState.style.display = 'block';
+  } else {
+    emptyState.style.display = 'none';
+  }
 });
 </script>
 </body>
