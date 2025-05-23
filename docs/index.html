@@ -403,23 +403,6 @@ body {
   <!-- 아카이브 리스트 -->
   <div class="archive-list" id="newsArchive">
     <!-- ITEMS_BEGIN --><!-- ITEMS_END -->
-<a href="https://so247.github.io/JP-daily-news/jp_dailynews_250523.html" class="archive-item">
-  <div class="item-content">
-    <div class="item-header">
-      <div class="date-container">
-        <div class="weekday-tag">Fri</div>
-        <div class="date-full">2025년 5월 23일</div>
-      </div>
-      <div class="view-button">
-        보기
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-    </div>
-    <p class="item-subtitle">🔥Breaking: Elden Ring, 실사 영화화 결정! 게임 세계가 스크린으로 확장된다!</p>
-  </div>
-</a>
   </div>
 
   <!-- 빈 상태 메시지 -->
@@ -456,19 +439,26 @@ document.addEventListener('DOMContentLoaded', function() {
   const emptyState = document.getElementById('emptyState');
   const loadMoreContainer = document.querySelector('.load-more-container');
   
-  // 오늘 날짜 가져오기 함수
-  function getTodayDateString() {
+  // 오늘 날짜 가져오기 함수 (여러 형식 지원)
+  function getTodayDateStrings() {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}년 ${month}월 ${day}일`;
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    
+    return [
+      `${year}년 ${month}월 ${day}일`,           // 2025년 5월 23일
+      `${year}년 ${String(month).padStart(2, '0')}월 ${String(day).padStart(2, '0')}일`, // 2025년 05월 23일
+      `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,      // 2025-05-23
+      `${year}.${month}.${day}`,                // 2025.5.23
+      `${year}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`       // 2025.05.23
+    ];
   }
   
-  // 날짜 비교 함수 (YYYY년 MM월 DD일 형식)
+  // 날짜 비교 함수 (다양한 형식 지원)
   function isToday(dateString) {
-    const todayString = getTodayDateString();
-    return dateString === todayString;
+    const todayFormats = getTodayDateStrings();
+    return todayFormats.includes(dateString.trim());
   }
   
   // 뉴스 아이템 추가 함수
