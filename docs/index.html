@@ -403,23 +403,6 @@ body {
   <!-- 아카이브 리스트 -->
   <div class="archive-list" id="newsArchive">
     <!-- ITEMS_BEGIN --><!-- ITEMS_END -->
-<a href="https://so247.github.io/JP-daily-news/jp_dailynews_250523.html" class="archive-item">
-  <div class="item-content">
-    <div class="item-header">
-      <div class="date-container">
-        <div class="weekday-tag">Fri</div>
-        <div class="date-full">2025년 5월 23일</div>
-      </div>
-      <div class="view-button">
-        보기
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-    </div>
-    <p class="item-subtitle">🔥Breaking: Elden Ring, 실사 영화 제작 발표! 게임의 세계가 스크린으로 확장된다!</p>
-  </div>
-</a>
   </div>
 
   <!-- 빈 상태 메시지 -->
@@ -456,37 +439,33 @@ document.addEventListener('DOMContentLoaded', function() {
   const emptyState = document.getElementById('emptyState');
   const loadMoreContainer = document.querySelector('.load-more-container');
   
-  // 오늘 날짜 가져오기 함수 (여러 형식 지원)
-  function getTodayDateStrings() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1;
-    const day = today.getDate();
-    
-    return [
-      `${year}년 ${month}월 ${day}일`,           // 2025년 5월 23일
-      `${year}년 ${String(month).padStart(2, '0')}월 ${String(day).padStart(2, '0')}일`, // 2025년 05월 23일
-      `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,      // 2025-05-23
-      `${year}.${month}.${day}`,                // 2025.5.23
-      `${year}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')}`       // 2025.05.23
-    ];
+  // NEW 배지 관리 - 참고 코드 방식 적용
+  function updateNewBadges() {
+    // 기존 NEW 배지 모두 제거
+    const existingBadges = document.querySelectorAll('.new-badge');
+    existingBadges.forEach(badge => badge.remove());
+
+    const allItems = archiveList.querySelectorAll('.archive-item');
+
+    // 첫 번째 항목에만 NEW 배지 추가
+    if (allItems.length > 0) {
+      const firstItem = allItems[0];
+      const dateContainer = firstItem.querySelector('.date-container');
+      if (dateContainer) {
+        const newBadge = document.createElement('div');
+        newBadge.className = 'new-badge';
+        newBadge.textContent = 'NEW';
+        dateContainer.appendChild(newBadge);
+      }
+    }
   }
   
-  // 날짜 비교 함수 (다양한 형식 지원)
-  function isToday(dateString) {
-    const todayFormats = getTodayDateStrings();
-    return todayFormats.includes(dateString.trim());
-  }
-  
-  // 뉴스 아이템 추가 함수
+  // 뉴스 아이템 추가 함수 (기존 유지하되 NEW 배지는 자동으로 관리)
   window.addNewsItem = function(date, weekday, title, url, forceNew = false) {
     // 빈 상태 메시지 숨기기
     emptyState.style.display = 'none';
     
-    // 오늘 날짜인지 확인하거나 강제로 NEW 표시
-    const shouldShowNew = forceNew || isToday(date);
-    
-    // 새 아이템 생성
+    // 새 아이템 생성 (NEW 배지는 포함하지 않음)
     const item = document.createElement('a');
     item.className = 'archive-item';
     item.href = url;
@@ -497,7 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="date-container">
             <div class="weekday-tag">${weekday}</div>
             <div class="date-full">${date}</div>
-            ${shouldShowNew ? '<div class="new-badge">NEW</div>' : ''}
           </div>
           <div class="view-button">
             보기
@@ -513,28 +491,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // 리스트 맨 위에 추가
     archiveList.insertBefore(item, archiveList.firstChild);
     
-    // 기존 아이템들의 NEW 배지 업데이트 (오늘이 아닌 것들은 제거)
+    // NEW 배지 업데이트 (첫 번째 항목에만)
     updateNewBadges();
     
     // 더보기 버튼 표시 여부 업데이트
     updateLoadMoreButton();
   };
-  
-  // NEW 배지 업데이트 함수
-  function updateNewBadges() {
-    const items = archiveList.querySelectorAll('.archive-item');
-    items.forEach(item => {
-      const dateElement = item.querySelector('.date-full');
-      const newBadge = item.querySelector('.new-badge');
-      
-      if (dateElement && newBadge) {
-        const itemDate = dateElement.textContent;
-        if (!isToday(itemDate)) {
-          newBadge.remove();
-        }
-      }
-    });
-  }
   
   // 더보기 버튼 업데이트
   function updateLoadMoreButton() {
@@ -544,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // 페이지 로드 시 NEW 배지 업데이트
+  // 페이지 로드 시 NEW 배지 업데이트 (첫 번째 항목에만)
   updateNewBadges();
   
   // 초기 상태: 뉴스가 없으면 빈 상태 메시지 표시
@@ -555,24 +517,10 @@ document.addEventListener('DOMContentLoaded', function() {
     emptyState.style.display = 'none';
   }
   
-  // 매일 자정에 NEW 배지 업데이트 (선택사항)
-  function scheduleNewBadgeUpdate() {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    
-    const msUntilMidnight = tomorrow.getTime() - now.getTime();
-    
-    setTimeout(() => {
-      updateNewBadges();
-      // 다음날을 위해 다시 스케줄링
-      scheduleNewBadgeUpdate();
-    }, msUntilMidnight);
-  }
-  
-  // 자정 업데이트 스케줄링 시작
-  scheduleNewBadgeUpdate();
+  // 새 항목이 추가될 때 자동으로 NEW 배지 재계산하는 기능
+  window.recalculateNewBadges = function() {
+    updateNewBadges();
+  };
 });
 </script>
 </body>
