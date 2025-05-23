@@ -208,15 +208,27 @@ body {
   padding: 3px 8px;
   border-radius: 20px;
   margin-left: 8px;
-  animation: pulse 1.5s infinite;
+  animation: pulse-new 1.5s infinite;
   box-shadow: 0 2px 4px rgba(196, 149, 108, 0.3);
   letter-spacing: 0.3px;
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(196, 149, 108, 0.7); opacity: 1; }
-  70% { box-shadow: 0 0 0 6px rgba(196, 149, 108, 0); opacity: 0.8; }
-  100% { box-shadow: 0 0 0 0 rgba(196, 149, 108, 0); opacity: 1; }
+@keyframes pulse-new {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(196, 149, 108, 0.7); 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 0 6px rgba(196, 149, 108, 0); 
+    opacity: 0.8; 
+    transform: scale(1.05);
+  }
+  100% { 
+    box-shadow: 0 0 0 0 rgba(196, 149, 108, 0); 
+    opacity: 1; 
+    transform: scale(1);
+  }
 }
 
 .view-button {
@@ -380,7 +392,7 @@ body {
   <!-- 헤더 -->
   <div class="header">
     <div class="header-icon-container">
-      <div class="header-icon">🎮</div>
+      <div class="header-icon">🗾</div>
     </div>
     <div class="header-text">
       <h1 class="header-title">일본 Daily Gaming News</h1>
@@ -391,23 +403,6 @@ body {
   <!-- 아카이브 리스트 -->
   <div class="archive-list" id="newsArchive">
     <!-- ITEMS_BEGIN --><!-- ITEMS_END -->
-<a href="https://so247.github.io/JP-daily-news/jp_dailynews_250523.html" class="archive-item">
-  <div class="item-content">
-    <div class="item-header">
-      <div class="date-container">
-        <div class="weekday-tag">Fri</div>
-        <div class="date-full">2025년 5월 23일</div>
-      </div>
-      <div class="view-button">
-        보기
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-    </div>
-    <p class="item-subtitle">🔥Breaking: Elden Ring, 영화화로 확장된 세계관! 조지 R. R. 마틴이 프로듀서로 참여하다</p>
-  </div>
-</a>
   </div>
 
   <!-- 빈 상태 메시지 -->
@@ -444,10 +439,28 @@ document.addEventListener('DOMContentLoaded', function() {
   const emptyState = document.getElementById('emptyState');
   const loadMoreContainer = document.querySelector('.load-more-container');
   
+  // 오늘 날짜 가져오기 함수
+  function getTodayDateString() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}년 ${month}월 ${day}일`;
+  }
+  
+  // 날짜 비교 함수 (YYYY년 MM월 DD일 형식)
+  function isToday(dateString) {
+    const todayString = getTodayDateString();
+    return dateString === todayString;
+  }
+  
   // 뉴스 아이템 추가 함수
-  window.addNewsItem = function(date, weekday, title, url, isNew = false) {
+  window.addNewsItem = function(date, weekday, title, url, forceNew = false) {
     // 빈 상태 메시지 숨기기
     emptyState.style.display = 'none';
+    
+    // 오늘 날짜인지 확인하거나 강제로 NEW 표시
+    const shouldShowNew = forceNew || isToday(date);
     
     // 새 아이템 생성
     const item = document.createElement('a');
@@ -460,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="date-container">
             <div class="weekday-tag">${weekday}</div>
             <div class="date-full">${date}</div>
-            ${isNew ? '<div class="new-badge">NEW</div>' : ''}
+            ${shouldShowNew ? '<div class="new-badge">NEW</div>' : ''}
           </div>
           <div class="view-button">
             보기
@@ -476,15 +489,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // 리스트 맨 위에 추가
     archiveList.insertBefore(item, archiveList.firstChild);
     
-    // 기존 NEW 배지 제거
-    const existingBadges = archiveList.querySelectorAll('.new-badge');
-    existingBadges.forEach((badge, index) => {
-      if (index > 0) badge.remove(); // 첫 번째만 유지
-    });
+    // 기존 아이템들의 NEW 배지 업데이트 (오늘이 아닌 것들은 제거)
+    updateNewBadges();
     
     // 더보기 버튼 표시 여부 업데이트
     updateLoadMoreButton();
   };
+  
+  // NEW 배지 업데이트 함수
+  function updateNewBadges() {
+    const items = archiveList.querySelectorAll('.archive-item');
+    items.forEach(item => {
+      const dateElement = item.querySelector('.date-full');
+      const newBadge = item.querySelector('.new-badge');
+      
+      if (dateElement && newBadge) {
+        const itemDate = dateElement.textContent;
+        if (!isToday(itemDate)) {
+          newBadge.remove();
+        }
+      }
+    });
+  }
   
   // 더보기 버튼 업데이트
   function updateLoadMoreButton() {
@@ -494,6 +520,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
+  // 페이지 로드 시 NEW 배지 업데이트
+  updateNewBadges();
+  
   // 초기 상태: 뉴스가 없으면 빈 상태 메시지 표시
   const items = archiveList.querySelectorAll('.archive-item');
   if (items.length === 0) {
@@ -501,6 +530,25 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     emptyState.style.display = 'none';
   }
+  
+  // 매일 자정에 NEW 배지 업데이트 (선택사항)
+  function scheduleNewBadgeUpdate() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const msUntilMidnight = tomorrow.getTime() - now.getTime();
+    
+    setTimeout(() => {
+      updateNewBadges();
+      // 다음날을 위해 다시 스케줄링
+      scheduleNewBadgeUpdate();
+    }, msUntilMidnight);
+  }
+  
+  // 자정 업데이트 스케줄링 시작
+  scheduleNewBadgeUpdate();
 });
 </script>
 </body>
