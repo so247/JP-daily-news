@@ -531,7 +531,7 @@ body {
   </div>
 
   <!-- 더보기 버튼 -->
-  <div class="load-more-container" style="display: none;">
+  <div class="load-more-container" id="loadMoreContainer" style="display: none;">
     <button class="load-more-button" id="loadMoreButton">
       더 많은 뉴스레터 불러오기
       <span class="icon">↓</span>
@@ -563,7 +563,61 @@ body {
 document.addEventListener('DOMContentLoaded', function() {
   const archiveList = document.getElementById('newsArchive');
   const emptyState = document.getElementById('emptyState');
-  const loadMoreContainer = document.querySelector('.load-more-container');
+  const loadMoreContainer = document.getElementById('loadMoreContainer');
+  const loadMoreButton = document.getElementById('loadMoreButton');
+  
+  // 표시할 아이템 수 설정
+  const ITEMS_PER_PAGE = 5;
+  let currentVisibleItems = ITEMS_PER_PAGE;
+  
+  // 페이지네이션 관리
+  function updateItemsVisibility() {
+    const allItems = archiveList.querySelectorAll('.archive-item');
+    
+    // 모든 아이템을 숨김
+    allItems.forEach((item, index) => {
+      if (index < currentVisibleItems) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    
+    // 더보기 버튼 표시/숨김
+    if (allItems.length > currentVisibleItems) {
+      loadMoreContainer.style.display = 'block';
+    } else {
+      loadMoreContainer.style.display = 'none';
+    }
+  }
+  
+  // 더보기 버튼 클릭 이벤트
+  loadMoreButton.addEventListener('click', function() {
+    const allItems = archiveList.querySelectorAll('.archive-item');
+    
+    // 다음 페이지의 아이템들을 표시
+    currentVisibleItems = Math.min(currentVisibleItems + ITEMS_PER_PAGE, allItems.length);
+    
+    // 아이템 표시 업데이트
+    updateItemsVisibility();
+    
+    // 버튼 애니메이션 효과
+    this.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      this.style.transform = 'scale(1)';
+    }, 150);
+    
+    // 모든 아이템이 표시되면 버튼 텍스트 변경
+    if (currentVisibleItems >= allItems.length) {
+      this.innerHTML = `
+        모든 뉴스레터가 표시되었습니다
+        <span class="icon">✓</span>
+      `;
+      this.disabled = true;
+      this.style.opacity = '0.6';
+      this.style.cursor = 'not-allowed';
+    }
+  });
   
   // NEW 배지 관리 - 참고 코드 방식 적용
   function updateNewBadges() {
@@ -620,28 +674,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // NEW 배지 업데이트 (첫 번째 항목에만)
     updateNewBadges();
     
-    // 더보기 버튼 표시 여부 업데이트
-    updateLoadMoreButton();
+    // 아이템 표시 업데이트
+    updateItemsVisibility();
   };
   
-  // 더보기 버튼 업데이트
-  function updateLoadMoreButton() {
+  // 페이지 로드 시 초기화
+  function initializePage() {
     const items = archiveList.querySelectorAll('.archive-item');
-    if (items.length > 5) {
-      loadMoreContainer.style.display = 'block';
+    
+    if (items.length === 0) {
+      emptyState.style.display = 'block';
+      loadMoreContainer.style.display = 'none';
+    } else {
+      emptyState.style.display = 'none';
+      updateNewBadges();
+      updateItemsVisibility();
     }
   }
   
-  // 페이지 로드 시 NEW 배지 업데이트 (첫 번째 항목에만)
-  updateNewBadges();
-  
-  // 초기 상태: 뉴스가 없으면 빈 상태 메시지 표시
-  const items = archiveList.querySelectorAll('.archive-item');
-  if (items.length === 0) {
-    emptyState.style.display = 'block';
-  } else {
-    emptyState.style.display = 'none';
-  }
+  // 초기화 실행
+  initializePage();
   
   // 새 항목이 추가될 때 자동으로 NEW 배지 재계산하는 기능
   window.recalculateNewBadges = function() {
